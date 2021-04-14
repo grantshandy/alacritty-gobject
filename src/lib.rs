@@ -1,8 +1,24 @@
+// Special thanks to https://github.com/unrelentingtech/galacritty/ for inspiration
+// use std::cell::RefCell;
+// use std::os::unix::io::{RawFd, AsRawFd};
+// use std::sync::Arc;
+// use std::thread::JoinHandle;
+// use std::rc::Rc;
+
+// use shared_library::dynamic_library::DynamicLibrary;
+
 use gtk::glib;
 use gtk::prelude::*;
-use alacritty::display::Display;
+// use glib::clone;
 
-// Implementation of our custom GObject
+// use alacritty_terminal::sync::FairMutex;
+// use alacritty_terminal::event_loop::{Notifier, EventLoop, State};
+// use alacritty_terminal::config::Config;
+// use alacritty_terminal::tty::{self, Pty};
+// use alacritty_terminal::Term;
+// use alacritty_terminal::term::SizeInfo;
+
+// Implementation of our terminal GObject
 mod imp {
     // Import parent scope
     use super::*;
@@ -18,7 +34,7 @@ mod imp {
     impl ObjectSubclass for Terminal {
         const NAME: &'static str = "Terminal";
         type Type = super::Terminal;
-        type ParentType = gtk::Button;
+        type ParentType = gtk::GLArea;
     }
 
     // Trait shared by all GObjects
@@ -27,27 +43,23 @@ mod imp {
     // Trait shared by all widgets
     impl WidgetImpl for Terminal {}
 
-    // Trait shared by all buttons
-    impl ButtonImpl for Terminal {}
+    // Trait shared by all GLAreas
+    impl GLAreaImpl for Terminal {}
 }
 
 glib::wrapper! {
     pub struct Terminal(ObjectSubclass<imp::Terminal>)
-        @extends gtk::Button, gtk::Widget;
+        @extends gtk::GLArea, gtk::Widget;
 }
 
 impl Terminal {
+    // Creates a new Terminal with default configurations.
     pub fn new() -> Self {
-        glib::Object::new(&[]).expect("Failed to create Button")
+        let gl_area = glib::Object::new(&[]).expect("Failed to create Button");
+
+        return gl_area;
     }
-
-    pub fn with_label(label: &str) -> Self {
-        let button = Self::new();
-        button.set_label(label);
-        button
-    }
-}
-
-pub fn start_term_window() {
-
+    // pub fn with_config() {}
+    // pub fn set_font_size() {}
+    // pub fn set_config(&self) {}
 }
