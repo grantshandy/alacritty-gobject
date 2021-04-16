@@ -1,13 +1,13 @@
-use gtk::prelude::*;
 use alacritty_gobject::Terminal;
+use gtk::prelude::*;
 
 fn main() {
     // Create a new application
     let application = gtk::Application::new(Some("com.DefunctLizard.example"), Default::default());
-    
+
     application.connect_activate(|application| {
         // Create a new window
-        let window =gtk::ApplicationWindow::new(application);
+        let window = gtk::ApplicationWindow::new(application);
         window.set_title(Some("alacritty-gobject example window"));
 
         // Create a terminal

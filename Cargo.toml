@@ -11,4 +11,4 @@ gtk = { git = "https://github.com/gtk-rs/gtk4-rs", package = "gtk4" }
 alacritty_terminal = "0.13.0"
 # epoxy = "0.1.0"
 # shared_library = "0.1.9"
-# gl = "0.14.0"
+gl = "0.14.0"

@@ -1,22 +1,16 @@
-// Special thanks to https://github.com/unrelentingtech/galacritty/ for inspiration
-// use std::cell::RefCell;
-// use std::os::unix::io::{RawFd, AsRawFd};
-// use std::sync::Arc;
-// use std::thread::JoinHandle;
-// use std::rc::Rc;
+// Special thanks to https://github.com/unrelentingtech/galacritty/ for inspiration, and, admittedly, code :)
+use std::sync::Arc;
+
+use glib::clone;
+use gtk::glib;
+use gtk::prelude::*;
 
 // use shared_library::dynamic_library::DynamicLibrary;
 
-use gtk::glib;
-use gtk::prelude::*;
-// use glib::clone;
-
-// use alacritty_terminal::sync::FairMutex;
-// use alacritty_terminal::event_loop::{Notifier, EventLoop, State};
-// use alacritty_terminal::config::Config;
-// use alacritty_terminal::tty::{self, Pty};
-// use alacritty_terminal::Term;
-// use alacritty_terminal::term::SizeInfo;
+use alacritty_terminal::config::Config;
+use alacritty_terminal::sync::FairMutex;
+use alacritty_terminal::term::{SizeInfo, Term};
+use alacritty_terminal::tty;
 
 // Implementation of our terminal GObject
 mod imp {
@@ -27,7 +21,10 @@ mod imp {
 
     // Object holding the state
     #[derive(Default)]
-    pub struct Terminal;
+    pub struct Terminal {
+        pub config: Config,
+        pub size: SizeInfo,
+    }
 
     // The central trait for subclassing a GObject
     #[glib::object_subclass]
@@ -55,7 +52,44 @@ glib::wrapper! {
 impl Terminal {
     // Creates a new Terminal with default configurations.
     pub fn new() -> Self {
-        let gl_area = glib::Object::new(&[]).expect("Failed to create Button");
+        let gl_area: Terminal = glib::Object::new(&[]).expect("Failed to create Terminal Widget");
+
+        gl_area.connect_realize(move |gl_area| {
+            gl_area.make_current();
+            match gl_area.get_error() {
+                Some(error) => {
+                    println!("gtk::GLArea error: {}", error);
+                    return;
+                }
+                None => {}
+            }
+
+            gl_area.set_has_depth_buffer(true);
+
+            // epoxy::load_with(|s| {
+            //     unsafe {
+            //         match DynamicLibrary::open(None).unwrap().symbol(s) {
+            //             Ok(v) => v,
+            //             Err(_) => std::ptr::null(),
+            //         }
+            //     }
+            // });
+            // gl::load_with(epoxy::get_proc_addr);
+
+            let config = Config::default();
+
+            let v_size = gl_area.get_size(gtk::Orientation::Vertical);
+            let h_size = gl_area.get_size(gtk::Orientation::Horizontal);
+
+            let size = SizeInfo::new(h_size, v_size, 3.0, 3.0, 0, 0, false);
+
+            let terminal = Term::new(&config, size);
+            let terminal = Arc::new(FairMutex::new(terminal));
+
+            let pty = tty::new(&config, &size, None);
+
+
+        });
 
         return gl_area;
     }
