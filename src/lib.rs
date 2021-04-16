@@ -1,16 +1,22 @@
-// Special thanks to https://github.com/unrelentingtech/galacritty/ for inspiration, and, admittedly, code :)
+// Special thanks to https://github.com/unrelentingtech/galacritty/ for inspiration.
 use std::sync::Arc;
+use std::default::Default;
+use std::path::PathBuf;
 
-use glib::clone;
 use gtk::glib;
 use gtk::prelude::*;
 
-// use shared_library::dynamic_library::DynamicLibrary;
-
-use alacritty_terminal::config::Config;
+use alacritty_terminal::config::{Config, Selection, Scrolling};
 use alacritty_terminal::sync::FairMutex;
 use alacritty_terminal::term::{SizeInfo, Term};
 use alacritty_terminal::tty;
+use alacritty_terminal::event_loop::{EventLoop, Notifier};
+use alacritty_terminal::event::{Event, EventListener};
+pub use alacritty_terminal::config::Program;
+
+// use glutin::event_loop::EventLoop as GlutinEventLoop;
+
+mod config;
 
 // Implementation of our terminal GObject
 mod imp {
@@ -21,10 +27,7 @@ mod imp {
 
     // Object holding the state
     #[derive(Default)]
-    pub struct Terminal {
-        pub config: Config,
-        pub size: SizeInfo,
-    }
+    pub struct Terminal;
 
     // The central trait for subclassing a GObject
     #[glib::object_subclass]
@@ -51,7 +54,7 @@ glib::wrapper! {
 
 impl Terminal {
     // Creates a new Terminal with default configurations.
-    pub fn new() -> Self {
+    pub fn new(program: Program, working_directory: Option<PathBuf>) -> Self {
         let gl_area: Terminal = glib::Object::new(&[]).expect("Failed to create Terminal Widget");
 
         gl_area.connect_realize(move |gl_area| {
@@ -66,28 +69,33 @@ impl Terminal {
 
             gl_area.set_has_depth_buffer(true);
 
-            // epoxy::load_with(|s| {
-            //     unsafe {
-            //         match DynamicLibrary::open(None).unwrap().symbol(s) {
-            //             Ok(v) => v,
-            //             Err(_) => std::ptr::null(),
-            //         }
-            //     }
-            // });
-            // gl::load_with(epoxy::get_proc_addr);
 
-            let config = Config::default();
 
-            let v_size = gl_area.get_size(gtk::Orientation::Vertical);
+            // Create a SizeInfo from gl_area for our new Term.
             let h_size = gl_area.get_size(gtk::Orientation::Horizontal);
+            let v_size = gl_area.get_size(gtk::Orientation::Vertical);
 
-            let size = SizeInfo::new(h_size, v_size, 3.0, 3.0, 0, 0, false);
+            let size = SizeInfo::new(h_size as f32, v_size as f32, 3.0, 3.0, 0.0, 0.0, false);
+            let config = config::get_config(program, working_directory);
 
-            let terminal = Term::new(&config, size);
+            // Create a Term from our config and sizes that we created.
+            let terminal = Term::new(&config, size, Notifier);
             let terminal = Arc::new(FairMutex::new(terminal));
 
             let pty = tty::new(&config, &size, None);
 
+            // let event_loop = EventLoop::new(
+            //     Arc::clone(&terminal),
+            //     *Box::new(Listen),
+            //     pty,
+            //     false,
+            //     false,
+            // );
+    
+            // let myself = Self {
+            //     config,
+            //     size,
+            // };
 
         });
 
