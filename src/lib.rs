@@ -69,8 +69,6 @@ impl Terminal {
 
             gl_area.set_has_depth_buffer(true);
 
-
-
             // Create a SizeInfo from gl_area for our new Term.
             let h_size = gl_area.get_size(gtk::Orientation::Horizontal);
             let v_size = gl_area.get_size(gtk::Orientation::Vertical);

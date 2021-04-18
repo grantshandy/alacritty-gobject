@@ -11,14 +11,16 @@ pub fn get_config(program: Program, working_directory: Option<PathBuf>) -> Confi
     let hold = false;
 
 
-    Config {
-        env,
-        selection,
-        shell,
-        scrolling,
-        cursor,
-        working_directory,
-        ui_config,
-        hold,
-    };
+    // Config<OpionM> {
+    //     env,
+    //     selection,
+    //     shell,
+    //     scrolling,
+    //     cursor,
+    //     working_directory,
+    //     None,
+    //     hold,
+    // };
+
+    let config = Config::default();
 }
