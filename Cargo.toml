@@ -9,9 +9,10 @@ edition = "2018"
 [dependencies]
 gtk = { git = "https://github.com/gtk-rs/gtk4-rs", package = "gtk4" }
 alacritty_terminal = { git = "https://github.com/alacritty/alacritty", package = "alacritty_terminal" }
+gl_loader = "0.1.2"
+glium = "0.29.1"
 
 # alacritty_terminal = "0.13.0"
 # epoxy = "0.1.0"
 # shared_library = "0.1.9"
 # gl = "0.14.0"
-# glutin = "0.26.0"
