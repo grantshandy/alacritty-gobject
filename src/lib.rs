@@ -1,15 +1,13 @@
 // Special thanks to https://github.com/unrelentingtech/galacritty/ for inspiration.
 use std::default::Default;
-use std::sync::Arc;
+// use std::sync::Arc;
+
+// use glutin::event_loop::EventLoop as GlutinEventLoop;
+pub mod window;
+pub mod support;
 
 use gtk::glib;
 use gtk::prelude::*;
-
-use alacritty_terminal::Term;
-use alacritty_terminal::sync::FairMutex;
-use alacritty_terminal::term::SizeInfo;
-
-mod glium_widgets;
 
 // Implementation of our custom GObject
 mod imp {
@@ -49,23 +47,7 @@ impl Terminal {
     // Creates a new Terminal with default configurations.
     pub fn new() -> Self {
         let gl_area: Terminal = glib::Object::new(&[]).expect("Failed to create Terminal Widget");
-
-        gl_loader::init_gl();
-
-        gl_area.connect_realize(move |gl_area| {
-            gl_area.make_current();
-
-            let width = gl_area.width();
-            let height = gl_area.height();
-
-            let size_info = SizeInfo::new(width as f32, height as f32, 3.0, 3.0, 0, 0, false);
-            let config = Config::default();
-
-            let terminal = Term::new(&config, size_info, );
-            let terminal = Arc::new(FairMutex::new(terminal));
-
-        });
-
+    
         return gl_area;
     }
 }

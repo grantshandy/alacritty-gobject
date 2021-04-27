@@ -1,4 +1,4 @@
-use alacritty_gobject::{Terminal, Program};
+use alacritty_gobject::Terminal;
 use gtk::prelude::*;
 
 fn main() {
