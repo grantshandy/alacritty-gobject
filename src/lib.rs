@@ -1,10 +1,5 @@
 // Special thanks to https://github.com/unrelentingtech/galacritty/ for inspiration.
 use std::default::Default;
-// use std::sync::Arc;
-
-// use glutin::event_loop::EventLoop as GlutinEventLoop;
-pub mod window;
-pub mod support;
 
 use gtk::glib;
 use gtk::prelude::*;
